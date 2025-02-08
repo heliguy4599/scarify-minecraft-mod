@@ -12,17 +12,17 @@ import net.minecraft.entity.ai.pathing.EntityNavigation;
 import net.minecraft.entity.ai.pathing.Path;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.mob.PathAwareEntity;
+import net.minecraft.entity.passive.VillagerEntity;
+import net.minecraft.entity.passive.WanderingTraderEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
 
 public class FleeFromPlayerGoal extends Goal {
     protected final PathAwareEntity mob;
-    private final double slowSpeed;
-    private final double fastSpeed;
+    private final double speed;
     @Nullable
     protected PlayerEntity targetPlayer;
-    protected double fastFleeDistanceLimit;
     @Nullable
     protected Path fleePath;
     protected final EntityNavigation fleeingEntityNavigation;
@@ -36,8 +36,14 @@ public class FleeFromPlayerGoal extends Goal {
         this.setControls(EnumSet.of(Control.MOVE));
 
         double mobSpeed = this.mob.getAttributeValue(EntityAttributes.GENERIC_MOVEMENT_SPEED);
-        this.slowSpeed = mobSpeed + 0.8;
-        this.fastSpeed = mobSpeed + 1.3;
+        if (this.mob instanceof VillagerEntity) {
+            mobSpeed += 0.2;
+        } else if (this.mob instanceof WanderingTraderEntity) {
+            mobSpeed = 0.5;
+        } else {
+            mobSpeed += 1.3;
+        }
+        this.speed = mobSpeed;
     }
 
     @Override
@@ -58,8 +64,6 @@ public class FleeFromPlayerGoal extends Goal {
             return false;
         }
         this.fleePath = this.fleeingEntityNavigation.findPathTo(vec3d.x, vec3d.y, vec3d.z, 0);
-        Scarify.LOGGER.info("VIS SCALE OF PLAYER: {}", getVisibilityScale(this.targetPlayer));
-        Scarify.LOGGER.info("FLEE LIMIT: [{}]", this.fastFleeDistanceLimit);
         return this.fleePath != null;
     }
 
@@ -86,7 +90,6 @@ public class FleeFromPlayerGoal extends Goal {
             }
             maxDistance *= maxDistance;
             final var mobDistance = this.mob.squaredDistanceTo(player);
-            Scarify.LOGGER.info("Distance: [{}]", maxDistance);
             if (mobDistance < maxDistance) {
                 mobsInRange.put(player, mobDistance);
             }
@@ -135,18 +138,11 @@ public class FleeFromPlayerGoal extends Goal {
 
     @Override
     public void start() {
-        this.fleeingEntityNavigation.startMovingAlong(this.fleePath, this.slowSpeed);
+        this.fleeingEntityNavigation.startMovingAlong(this.fleePath, this.speed);
     }
 
     @Override
     public void stop() {
         this.targetPlayer = null;
-    }
-
-    @Override
-    public void tick() {
-//        final var shouldBeFast = this.mob.squaredDistanceTo(this.targetPlayer) < this.fastFleeDistanceLimit;
-//        this.mob.getNavigation().setSpeed(shouldBeFast ? this.fastSpeed : this.slowSpeed);
-        this.mob.getNavigation().setSpeed(this.fastSpeed);
     }
 }

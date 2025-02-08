@@ -18,7 +18,6 @@ import java.nio.file.Path;
 public class Scarify implements ModInitializer {
 	public static final String MOD_ID = "scarify";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-	private static Boolean isPehkuiLoaded = null;
 	public static Path MOD_CONFIG_PATH;
 	public static ConfigFile configFile;
 
