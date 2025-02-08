@@ -49,18 +49,16 @@ public class PlayerSuggestion implements SuggestionProvider<ServerCommandSource>
 
         if (configFile != null) {
             Set<String> configNames = configFile.getSectionNames();
+
             if (excludeConfigFileEntries) {
                 toAdd.removeAll(configNames);
             } else {
                 toAdd.addAll(configNames);
             }
-        }
 
-        if (configFile != null && !keyToCheck.isEmpty()) {
-            for (var p : toAdd) {
-                Scarify.LOGGER.info("ENTRY HAS KEY: {}", playerEntryHasKey(p));
+            if (!keyToCheck.isEmpty()) {
+                toAdd.removeIf(name -> !playerEntryHasKey(name));
             }
-            toAdd.removeIf(name -> !playerEntryHasKey(name));
         }
 
         toAdd.forEach(builder::suggest);
