@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.Tameable;
 import net.minecraft.entity.ai.NoPenaltyTargeting;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.pathing.EntityNavigation;
@@ -50,6 +51,10 @@ public class FleeFromPlayerGoal extends Goal {
     public boolean canStart() {
         final var world = this.mob.getWorld();
         if (!world.getGameRules().getBoolean(Scarify.ENABLE_SCARIFY)) {
+            return false;
+        }
+        if (this.mob instanceof Tameable tMob && tMob.getOwner() != null) {
+            // Don't make tamed mobs scared
             return false;
         }
         this.targetPlayer = getClosestPlayerInRange();

@@ -7,6 +7,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleFactory;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleRegistry;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.entity.Tameable;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.world.GameRules;
@@ -40,6 +41,10 @@ public class Scarify implements ModInitializer {
 		commandinator.registerCommands();
 
 		ServerEntityEvents.ENTITY_LOAD.register((entity, world) -> {
+			if (entity instanceof Tameable tEntity && tEntity.getOwner() != null) {
+				// Don't make tamed mobs scared
+				return;
+			}
 			if (entity instanceof MobEntity mob && configFile != null) {
 				injectFleePlayerGoal(mob);
 			}
