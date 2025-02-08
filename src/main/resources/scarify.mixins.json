@@ -1,0 +1,11 @@
+{
+	"required": true,
+	"package": "io.github.heliguy4599.scarify.mixin",
+	"compatibilityLevel": "JAVA_17",
+	"mixins": [
+		"MobGoalSelectorAccessor"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}
